@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# dataset file
+data/CAIL2018_ALL_DATA.zip
+data/**/final_all_data
+data/**/*.json
+data/**/*.zip
+data/**/*.npy
+!data/CAIL2018-Small/*.md

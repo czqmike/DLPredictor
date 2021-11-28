@@ -1,0 +1,2 @@
+1. Download dataset from [link](https://cail.oss-cn-qingdao.aliyuncs.com/CAIL2018_ALL_DATA.zip) and `unzip final_all_data/exercise_contest/*` to `data/CAIL2018-Small`
+2. run `code/data_preprocessing/data_label.py`, transform json files -> npy files.
