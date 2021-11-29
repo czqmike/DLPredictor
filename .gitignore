@@ -128,10 +128,17 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Vscode config
+.vscode
+
 # dataset file
 data/CAIL2018_ALL_DATA.zip
 data/**/final_all_data
 data/**/*.json
 data/**/*.zip
 data/**/*.npy
+data/**/*.pkl
 !data/CAIL2018-Small/*.md
+
+# weight 
+weight/*

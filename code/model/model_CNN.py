@@ -1,7 +1,7 @@
 '''
 Author: czqmike
 Date: 2021-11-28 17:26:10
-LastEditTime: 2021-11-28 18:18:55
+LastEditTime: 2021-11-29 16:35:59
 LastEditors: czqmike
 Description: 
 FilePath: /DLPredictor/code/model/model_CNN.py
@@ -13,9 +13,8 @@ from keras.layers import Dense, Dropout, BatchNormalization
 from numpy import ndarray
 
 
-def model_CNN_accusation(num_words: int, maxlen: int, output_dim: int, kernel_size: int, 
-						 fact_train: ndarray, label_train: ndarray)->keras.models.Model:
-	data_input = Input(shape=[fact_train.shape[1]])
+def model_CNN_accusation(num_words: int, maxlen: int, output_dim: int, kernel_size: int)->keras.models.Model:
+	data_input = Input(shape=[maxlen, ])
 	word_vec = Embedding(input_dim=num_words + 1,
 						input_length=maxlen,
 						output_dim=output_dim,
@@ -27,7 +26,7 @@ def model_CNN_accusation(num_words: int, maxlen: int, output_dim: int, kernel_si
 	x = BatchNormalization()(x)
 	x = Dense(1000, activation="relu")(x)
 	x = Dropout(0.2)(x)
-	x = Dense(label_train.shape[1], activation="sigmoid")(x)
+	x = Dense(output_dim, activation="sigmoid")(x)
 	model = Model(inputs=data_input, outputs=x)
 	model.compile(loss='binary_crossentropy',
 				optimizer='adam',

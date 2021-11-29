@@ -1,7 +1,7 @@
 '''
 Author: czqmike
 Date: 2021-11-28 16:43:54
-LastEditTime: 2021-11-28 20:41:26
+LastEditTime: 2021-11-29 17:01:23
 LastEditors: czqmike
 Description: 
 FilePath: /DLPredictor/code/main.py
@@ -29,37 +29,50 @@ args = parser.parse_args()
 #rel = "expansion"
 rel = "contingency"
 
-MAX_LEN = 100
-NUM_WORDS = 80000
+MAX_LEN = 400
+NUM_WORDS = 40000
+CUTLEN = 10000
+OUTPUT_DIM = 202
+path_to_dataset = '../data/CAIL2018-Small/'
 
 if __name__ == '__main__':
     # fact数据集
-    fact = np.load('./data_deal/big_fact_pad_seq_%d_%d.npy' %
-                    (NUM_WORDS, MAX_LEN))
+    fact = np.load(path_to_dataset + f'pad_seq/fact_pad_seq_{MAX_LEN}_{0}_{CUTLEN}.pkl', allow_pickle=True)
     fact_train, fact_test = train_test_split(fact, test_size=0.05, random_state=1)
+    print("type fact_train: ", type(fact_train))
+    print("len fact_train: ", len(fact_train))
+    fact_train = np.array(fact_train)
+    fact_test = np.array(fact_test)
     del fact
 
     # 标签数据集
-    labels = np.load('./data_deal/labels/labels_train_accusation.npy')
+    labels = np.load(path_to_dataset + 'labels/label_train_accusation.npy')
+    labels = labels[:CUTLEN]
     labels_train, labels_test = train_test_split(labels, test_size=0.05, random_state=1)
+    print("type labels_train: ", type(labels_train))
+    print("len labels_train: ", len(labels_train))
+    labels_train = np.array(labels_train)
+    labels_test = np.array(labels_test)
     del labels
 
-    model = Model(model_CNN_accusation())
+    model = model_CNN_accusation(num_words=NUM_WORDS, maxlen=MAX_LEN, output_dim=OUTPUT_DIM,
+                                       kernel_size=4)
 
     if args.train:
-        BATCH_SIZE = 6
-        EPOCH = 100
+        BATCH_SIZE = 8
+        EPOCH = 20
         n_start = 1
         n_end = 21
         score_list1 = []
         score_list2 = []
 
         for i in range(n_start, n_end):
-            model.fit(x=fact_train, y=labels_train, batch_size=BATCH_SIZE, epochs=EPOCH, verbose=1)
+            model.fit(x=fact_train, y=labels_train, batch_size=BATCH_SIZE, epochs=1, verbose=1)
 
-            if not os.path.exists('../weight'):
-                os.makedirs('../weight')
-            model.save_weights('../weight/%d_%d/accusation/CNN_epochs_%d.weight' % (NUM_WORDS, MAX_LEN, i))
+            path_to_weight = f'../weight/accusation/{NUM_WORDS}_{MAX_LEN}/'
+            if not os.path.exists(path_to_weight):
+                os.makedirs(path_to_weight)
+            model.save_weights(path_to_weight + 'CNN_epochs_%d.weight' % i)
 
             y = model.predict(fact_test[:])
             y1 = predict2top(y)
